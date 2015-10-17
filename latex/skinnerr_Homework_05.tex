@@ -1,0 +1,166 @@
+\documentclass[11pt]{article}
+
+\input{../../Latex_Common/skinnerr_latex_preamble_asen5417.tex}
+
+%%
+%% DOCUMENT START
+%%
+
+\begin{document}
+
+\pagestyle{fancyplain}
+\lhead{}
+\chead{}
+\rhead{}
+\lfoot{\hrule ASEN 5417: Homework 5}
+\cfoot{\hrule \thepage}
+\rfoot{\hrule Ryan Skinner}
+
+\noindent
+{\Large Homework 5}
+\hfill
+{\large Ryan Skinner}
+\\[0.5ex]
+{\large ASEN 5417: Numerical Methods}
+\hfill
+{\large Due 2015/10/20}\\
+\hrule
+\vspace{6pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction} %%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Problem 1}
+
+The partial differential equation (PDE) that governs one-dimensional heat transfer, with constants and boundary conditions given for a 2 cm-thick steel pipe, is
+\begin{equation}
+\frac{\partial u}{\partial t} = \frac{k}{c \rho} \frac{\partial^2 u}{\partial x^2}
+\;,
+\qquad
+\begin{aligned}
+u(0,t) &= 0 \;, \\
+u(2,t) &= 0 \;, \\
+u(x,0) &= 100 sin(\pi x / 2) \;,
+\end{aligned}
+\qquad
+\begin{aligned}
+k &= 0.13 \; &&\text{cal / sec cm \degree C} \;, \\
+c &= 0.11 \; &&\text{cal / g \degree C} \;, \\
+\rho &= 7.8 \; &&\text{g / cm$^3$}
+\;,
+\end{aligned}
+\label{eq:prob1}
+\end{equation}
+where $u(x,t)$ is the temperature in \degree C. Numerically integrate this PDE using the explicit forward-time, central-space (FTCS, or Euler) method with $\Delta x = 0.1$ cm. Choose $\Delta t$ such that the diffusion criterion is (a) $d = 0.5$ and (b) $d = 1.0$. Compare your solution for (a) at $t = \{1, 2, 4, 8\}$ sec with the analytical solution
+\begin{equation}
+u = 100 \exp(-0.3738t) \sin(\pi x / 2)
+\;.
+\label{eq:prob1_analytic}
+\end{equation}
+Note that for (b), the diffusion criterion is higher than the one allowed by the von Neumann method. For this case, plot your solutions at approximately $t = \{0.1, 0.5, 1, 2\}$ sec, and comment on stability.
+
+\subsection{Problem 2}
+
+Solve the system from Problem 1 using the implicit Crank-Nicolson method with forward time differencing. The Thomas algorithm can be utilized for this purpose. Try values for the diffusion criterion of $d = \{0.5, 1, 10\}$, and comment on the solution's stability.
+
+\subsection{Problem 3}
+
+Solve the system from Problem 1, but with an adiabatic boundary condition at the upper boundary,
+\begin{equation}
+u(0,t) = 0 \;, \qquad \frac{\partial u}{\partial x}(2,t) = 0
+\;.
+\label{eq:prob3}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Methodology} %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Problem 1}
+
+Discretizing \eqref{eq:prob1} using the forward-time, central-space (FTCS) method with explicit time advancement yields
+\begin{equation}
+\frac{u_i^{n+1} - u_i^n}{\Delta t} = \alpha \frac{u_{i+1}^n - 2u_i^n + u_{i-1}^n}{\Delta x^2}
+\;,
+\end{equation}
+where the subscript denotes the spatial grid point, and the superscript indexes the time step. Further note it is convenient to define the coefficient of thermal diffusivity as $\alpha \equiv k / c \rho = 0.1515$ m/s$^2$. Solving for the unknown quantity, we obtain
+\begin{equation}
+u_i^{n+1} = d u_{i-1}^n + (1-2d) u_i^n + d u_{i+1}^n
+\;,
+\label{eq:ftcs}
+\end{equation}
+where the diffusion number is defined as
+\begin{equation}
+d = \frac{\alpha \Delta t}{\Delta x^2}
+\;.
+\end{equation}
+Using \eqref{eq:ftcs}, it is trivial to step forward in time with Dirichlet boundary conditions on $u$.
+
+To obtain the requested diffusion numbers, we set (a) $\Delta t = 0.033$ and (b) $\Delta t = 0.066$.
+
+\subsection{Problem 2}
+
+\subsection{Problem 3}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Results} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Problem 1}
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[height=1.95in]{Prob1a_u.eps}
+\includegraphics[height=1.95in]{Prob1a_err.eps}
+\\[-0.5cm]
+\caption{FTCS solutions to \eqref{eq:prob1} compared to analytical solutions \eqref{eq:prob1_analytic}, and the point-wise relative error.}
+\label{fig:Prob2}
+\end{center}
+\end{figure}
+
+\subsection{Problem 2}
+
+\subsection{Problem 3}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion} %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Problem 1}
+
+\subsection{Problem 2}
+
+\subsection{Problem 3}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{References} %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+No external references were used other than the course notes for this assignment.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Appendix: MATLAB Code} %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The following code listings generate all figures presented in this homework assignment.
+
+%\includecode{Problem_1.m}
+%\includecode{Problem_2.m}
+
+%%
+%% DOCUMENT END
+%%
+\end{document}
