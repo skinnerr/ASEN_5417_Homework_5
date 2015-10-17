@@ -96,12 +96,15 @@ u_i^{n+1} = d u_{i-1}^n + (1-2d) u_i^n + d u_{i+1}^n
 \end{equation}
 where the diffusion number is defined as
 \begin{equation}
-d = \frac{\alpha \Delta t}{\Delta x^2}
+d = \frac{\alpha \Delta t}{\Delta x^2} 
+\quad
+\rightarrow
+\quad
+\Delta t = \frac{d \Delta x^2}{\alpha}
 \;.
+\label{eq:diffusion_number}
 \end{equation}
-Using \eqref{eq:ftcs}, it is trivial to step forward in time with Dirichlet boundary conditions on $u$.
-
-To obtain the requested diffusion numbers, we set (a) $\Delta t = 0.033$ and (b) $\Delta t = 0.066$.
+Using \eqref{eq:ftcs}, it is trivial to step forward in time with Dirichlet boundary conditions on $u$. We use \eqref{eq:diffusion_number} to obtain the requested diffusion numbers by setting (a) $\Delta t = 0.033$ and (b) $\Delta t = 0.066$.
 
 \subsection{Problem 2}
 
@@ -115,13 +118,20 @@ To obtain the requested diffusion numbers, we set (a) $\Delta t = 0.033$ and (b)
 
 \subsection{Problem 1}
 
+Results for the FTCS method are presented in \figref{fig:Prob1}.
+
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[height=1.95in]{Prob1a_u.eps}
-\includegraphics[height=1.95in]{Prob1a_err.eps}
+\includegraphics[scale=0.62]{Prob1a_err.eps}
+\hspace*{-0.2cm}
+\includegraphics[scale=0.62]{Prob1a_u.eps}
+\\
+\includegraphics[scale=0.62]{Prob1b_err.eps}
+\hspace*{-0.2cm}
+\includegraphics[scale=0.62]{Prob1b_u.eps}
 \\[-0.5cm]
-\caption{FTCS solutions to \eqref{eq:prob1} compared to analytical solutions \eqref{eq:prob1_analytic}, and the point-wise relative error.}
-\label{fig:Prob2}
+\caption{FTCS solutions to \eqref{eq:prob1} compared to analytical solutions \eqref{eq:prob1_analytic}, and the point-wise relative error over time. Upper plots are for $d=0.5$ ($\Delta t = 0.033$), and lower plots correspond to $d=0.1$ ($\Delta t = 0.066$).}
+\label{fig:Prob1}
 \end{center}
 \end{figure}
 
@@ -136,6 +146,8 @@ To obtain the requested diffusion numbers, we set (a) $\Delta t = 0.033$ and (b)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Problem 1}
+
+As can be seen in \figref{fig:Prob1}, FTCS results for a diffusion number of $d=0.5$ have fairly low relative error at all time-steps considered, and no numerical instability is present. For a condition number of $d=1.0$, which should be unstable according to the von Neumann method, we see instabilities manifest at $t \sim 2.0$. Relative error grows rapidly, as can be seen at $t \sim 2.1$. Later times are not shown, because the solution blows up.
 
 \subsection{Problem 2}
 

@@ -109,8 +109,8 @@ function [] = Problem_1()
     set(hax,'YScale','log');
     xlabel('x');
     ylabel('Relative Error');
-    hleg = legend('show');
-    set(hleg, 'Location', 'eastoutside');
+    %hleg = legend('show');
+    %set(hleg, 'Location', 'eastoutside');
     
     %%%
     % Process results: Part (b).
@@ -155,8 +155,8 @@ function [] = Problem_1()
     set(hax,'YScale','log');
     xlabel('x');
     ylabel('Relative Error');
-    hleg = legend('show');
-    set(hleg, 'Location', 'eastoutside');
+    %hleg = legend('show');
+    %set(hleg, 'Location', 'eastoutside');
     
 end
 
