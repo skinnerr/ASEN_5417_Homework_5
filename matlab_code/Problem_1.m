@@ -70,21 +70,29 @@ function [] = Problem_1()
     % Process results: Part (a).
     %%%
     
-    % Solution.
-    
     ts_plot = 1 + round([0,1,2,4,8] / dt(1));
     t_plot = (ts_plot-1) * dt(1);
+    
+    % Solution.
+    
+    hl = cell(length(ts_plot)+1,1);
+    dn = cell(length(ts_plot)+1,1);
+    
     figure();
     hold on;
     for i = 1:length(ts_plot)
-        plot(x, u{1}(ts_plot(i),:), ...
-            'DisplayName', sprintf('t ~ %.0f',t_plot(i)));
-        plot(x, analytical(t_plot(i),x), '--k', ...
-            'DisplayName', sprintf('t ~ %.0f (Analytical)',t_plot(i)));
+        hl{i} = plot(x, u{1}(ts_plot(i),:));
+        dn{i} = sprintf('t ~ %.1f',t_plot(i));
+        if i ~= length(ts_plot)
+            plot(x, analytical(t_plot(i),x), '--k');
+        else
+            hl{i+1} = plot(x, analytical(t_plot(i),x), '--k');
+            dn{i+1} = 'Analytical';
+        end
     end
     xlabel('x');
     ylabel('u');
-    hleg = legend('show');
+    hleg = legend([hl{:}], dn);
     set(hleg, 'Location', 'eastoutside');
     
     % Relative error.
@@ -96,7 +104,7 @@ function [] = Problem_1()
         relerr = abs(analytical(t_plot(i),x(2:end-1)) - u{1}(ts_plot(i),2:end-1)) ./ ...
                      analytical(t_plot(i),x(2:end-1));
         plot(x(2:end-1), relerr, ...
-            'DisplayName', sprintf('t ~ %.0f',t_plot(i)));
+            'DisplayName', sprintf('t ~ %.1f',t_plot(i)));
     end
     set(hax,'YScale','log');
     xlabel('x');
@@ -108,26 +116,29 @@ function [] = Problem_1()
     % Process results: Part (b).
     %%%
     
+    ts_plot = 1 + round([0, 0.1, 0.5, 1, 2, 2.1] / dt(2));
+    t_plot = (ts_plot-1) * dt(2);
+    
     % Solution.
     
-    ts_plot = 1 + round([0,0.1,0.5,1,2,2.1] / dt(2));
-    t_plot = (ts_plot-1) * dt(2);
+    hl = cell(length(ts_plot)+1,1);
+    dn = cell(length(ts_plot)+1,1);
+    
     figure();
     hold on;
     for i = 1:length(ts_plot)
-        plot(x, u{2}(ts_plot(i),:), ...
-            'DisplayName', sprintf('t ~ %.1f',t_plot(i)));
-        if i == length(ts_plot)
-            dn = 'Analytical Solutions';
+        hl{i} = plot(x, u{2}(ts_plot(i),:));
+        dn{i} = sprintf('t ~ %.1f',t_plot(i));
+        if i ~= length(ts_plot)
+            plot(x, analytical(t_plot(i),x), '--k');
         else
-            dn = '';
+            hl{i+1} = plot(x, analytical(t_plot(i),x), '--k');
+            dn{i+1} = 'Analytical';
         end
-        plot(x, analytical(t_plot(i),x), '--k', ...
-            'DisplayName', dn);
     end
     xlabel('x');
     ylabel('u');
-    hleg = legend('show');
+    hleg = legend([hl{:}], dn);
     set(hleg, 'Location', 'eastoutside');
     
     % Relative error.
