@@ -1,7 +1,7 @@
-function [diag, sub, sup, rhs] = Assemble_u( th, BC )
+function [diag, sub, sup, rhs] = Assemble_u( beta, u_prev, BC )
 
     %%%%%%
-    % Assembles the LHS matrix and the RHS vector for the u-system.
+    % Assembles the LHS matrix and the RHS vector for the g-system.
     %   diag -- diagonal
     %    sub -- sub-diagonal
     %    sup -- super-diagonal
@@ -10,24 +10,20 @@ function [diag, sub, sup, rhs] = Assemble_u( th, BC )
     % Ryan Skinner, October 2015
     %%%
     
-    N = length(th);
+    N = length(u_prev);
     
-    B = nan(N-2,1);
-    C = nan(N-2,1);
-    D = nan(N-2,1);
-    for i = 2:N-1
-        B(i-1) =   2 / ((th(i+1) - th(i-1)) * (th(i+1) - th(i)));
-        C(i-1) =   2 / ((th(i+1) - th(i-1)) * (th(i)   - th(i-1)));
-        D(i-1) = (-2 / ( th(i+1) - th(i-1))) * (1/(th(i+1)-th(i)) + 1/(th(i)-th(i-1)));
-    end
+    diag_range = 2:N-1;
+     sub_range = 3:N-1;
+     sup_range = 2:N-2;
     
-    diag = 1/4 + D;
-    sub = C(2:end);
-    sup = B(1:end-1);
-    rhs = zeros(N-2,1);
+    diag = (1 + 2 * beta) * ones(length(diag_range),1);
+     sub = (       -beta) * ones(length(sub_range),1);
+     sup = (       -beta) * ones(length(sup_range),1);
+     rhs = u_prev(diag_range) + ...
+           beta * (u_prev(diag_range-1) - 2 * u_prev(diag_range) + u_prev(diag_range+1));
     
     % Account for boundary conditions.
-    rhs(1)   = rhs(1)   - C(1)   * BC.y0;
-    rhs(end) = rhs(end) - B(end) * BC.yf;
+    rhs(1)   = rhs(1)   - (-beta) * BC.u0;
+    rhs(end) = rhs(end) - (-beta) * BC.uf;
 
 end

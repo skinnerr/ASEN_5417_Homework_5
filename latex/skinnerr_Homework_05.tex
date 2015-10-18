@@ -54,17 +54,17 @@ c &= 0.11 \; &&\text{cal / g \degree C} \;, \\
 \end{aligned}
 \label{eq:prob1}
 \end{equation}
-where $u(x,t)$ is the temperature in \degree C. Numerically integrate this PDE using the explicit forward-time, central-space (FTCS, or Euler) method with $\Delta x = 0.1$ cm. Choose $\Delta t$ such that the diffusion criterion is (a) $d = 0.5$ and (b) $d = 1.0$. Compare your solution for (a) at $t = \{1, 2, 4, 8\}$ sec with the analytical solution
+where $u(x,t)$ is the temperature in \degree C. Numerically integrate this PDE using the explicit forward-time, central-space (FTCS, or Euler) method with $\Delta x = 0.1$ cm. Choose $\Delta t$ such that the diffusion criterion is (a) $d = \tfrac{1}{2}$ and (b) $d = 1$. Compare your solution for (a) at $t = \{1, 2, 4, 8\}$ sec with the analytical solution
 \begin{equation}
 u = 100 \exp(-0.3738t) \sin(\pi x / 2)
 \;.
 \label{eq:prob1_analytic}
 \end{equation}
-Note that for (b), the diffusion criterion is higher than the one allowed by the von Neumann method. For this case, plot your solutions at approximately $t = \{0.1, 0.5, 1, 2\}$ sec, and comment on stability.
+Note that for (b), the diffusion criterion is higher than the one allowed by the von Neumann method. For this case, plot your solutions at approximately $t = \{\tfrac{1}{10}, \tfrac{1}{2}, 1, 2\}$ sec, and comment on stability.
 
 \subsection{Problem 2}
 
-Solve the system from Problem 1 using the implicit Crank-Nicolson method with forward time differencing. The Thomas algorithm can be utilized for this purpose. Try values for the diffusion criterion of $d = \{0.5, 1, 10\}$, and comment on the solution's stability.
+Solve the system from Problem 1 using the implicit Crank-Nicolson method with forward time differencing. The Thomas algorithm can be utilized for this purpose. Try values for the diffusion criterion of $d = \{\tfrac{1}{2}, 1, 10\}$, and comment on the solution's stability.
 
 \subsection{Problem 3}
 
@@ -108,6 +108,41 @@ Using \eqref{eq:ftcs}, it is trivial to step forward in time with Dirichlet boun
 
 \subsection{Problem 2}
 
+The implicit Crank-Nicolson method with forward time-differencing is most-commonly used to solve the diffusion equation, which can be written as
+\begin{equation}
+\frac{u_i^{n+1} - u_i^n}{\Delta t}
+=
+\frac{\alpha}{2 \Delta x^2}
+\left(
+u_{i+1}^{n+1} - 2 u_i^{n+1} + u_{i-1}^{n+1} + u_{i+1}^n - 2 u_i^n + u_{i-1}^n
+\right)
+\;.
+\end{equation}
+It is a simple matter to re-write this as a linear equation relating the value of $u_i$ at the next time step to its spatial neighbors at the next time step, and its spatial neighbors at the current time step:
+\begin{equation}
+u_i^{n+1}
+=
+\beta
+\left(
+u_{i+1}^{n+1} - 2 u_i^{n+1} + u_{i-1}^{n+1} + u_{i+1}^n - 2 u_i^n + u_{i-1}^n
+\right)
++ u_i^n
+\end{equation}
+\begin{equation}
+  \underbrace{\left(      -\beta \right)}_{b_i} u_{i-1}^{n+1}
++ \underbrace{\left( 1 + 2 \beta \right)}_{a_i} u_i^{n+1}
++ \underbrace{\left(      -\beta \right)}_{c_i} u_{i+1}^{n+1}
+=
+\underbrace{\beta \left( u_{i+1}^n - 2 u_i^n + u_{i-1}^n \right) + u_i^n}_{d_i}
+\;,
+\end{equation}
+where
+\begin{equation}
+\beta = \frac{\alpha \Delta t}{2 \Delta x^2}
+\;,
+\end{equation}
+is known, along with all point-wise values of $u^n$. We solve the system of equations using Dirichlet boundary conditions with the same method detailed in Homework 3.
+
 \subsection{Problem 3}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -130,12 +165,33 @@ Results for the FTCS method are presented in \figref{fig:Prob1}.
 \hspace*{-0.2cm}
 \includegraphics[scale=0.62]{Prob1b_u.eps}
 \\[-0.5cm]
-\caption{FTCS solutions to \eqref{eq:prob1} compared to analytical solutions \eqref{eq:prob1_analytic}, and the point-wise relative error over time. Upper plots are for $d=0.5$ ($\Delta t = 0.033$), and lower plots correspond to $d=1.0$ ($\Delta t = 0.066$).}
+\caption{FTCS solutions to \eqref{eq:prob1} compared to analytical solutions \eqref{eq:prob1_analytic}, and the point-wise relative error over time. Upper plots are for $d=\tfrac{1}{2}$ ($\Delta t = 0.033$), and lower plots correspond to $d=1$ ($\Delta t = 0.066$).}
 \label{fig:Prob1}
 \end{center}
 \end{figure}
 
 \subsection{Problem 2}
+
+Results for the Crank-Nicolson method with Dirichlet boundary conditions are presented in \figref{fig:Prob2}.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[scale=0.62]{Prob2_d0p5_err.eps}
+\hspace*{-0.2cm}
+\includegraphics[scale=0.62]{Prob2_d0p5_u.eps}
+\\
+\includegraphics[scale=0.62]{Prob2_d1_err.eps}
+\hspace*{-0.2cm}
+\includegraphics[scale=0.62]{Prob2_d1_u.eps}
+\\
+\includegraphics[scale=0.62]{Prob2_d10_err.eps}
+\hspace*{-0.2cm}
+\includegraphics[scale=0.62]{Prob2_d10_u.eps}
+\\[-0.5cm]
+\caption{Crank-Nicolson solutions to \eqref{eq:prob1} compared to analytical solutions \eqref{eq:prob1_analytic}, and the point-wise relative error over time. Diffusion numbers $d$ are annotated. For $d = 10$, $\Delta t = 0.6601$.}
+\label{fig:Prob2}
+\end{center}
+\end{figure}
 
 \subsection{Problem 3}
 
@@ -147,9 +203,11 @@ Results for the FTCS method are presented in \figref{fig:Prob1}.
 
 \subsection{Problem 1}
 
-As can be seen in \figref{fig:Prob1}, FTCS results for a diffusion number of $d=0.5$ have fairly low relative error at all time-steps considered, and no numerical instability is present. For a condition number of $d=1.0$, which should be unstable according to the von Neumann method, we see instabilities manifest at $t \sim 2.0$. Relative error grows rapidly, as can be seen at $t \sim 2.1$. Later times are not shown, because the solution blows up.
+As can be seen in \figref{fig:Prob1}, FTCS results for a diffusion number of $d=\tfrac{1}{2}$ have fairly low relative error at all time-steps considered, and no numerical instability is present. For a condition number of $d=1$, which should be unstable according to the von Neumann method, we see high-frequency instabilities manifest at $t \sim 2.0$. Relative error grows rapidly, as can be seen at $t \sim 2.1$. Later times are not shown, because the solution quickly becomes non-physical.
 
 \subsection{Problem 2}
+
+As shown in \figref{fig:Prob2}, the Crank-Nicolson method produces results with point-wise errors slightly better than the FTCS method, at diffusion numbers at least $10\times$ greater than the maximum stable diffusion number of the FTCS method. We conclude that the Crank-Nicolson method is very stable. Though we do need to solve a matrix system at each time step, $\Delta t$ can be much higher than the FTCS method, and thus the Crank-Nicolson method has the potential for much higher efficiency.
 
 \subsection{Problem 3}
 
