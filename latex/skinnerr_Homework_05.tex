@@ -54,7 +54,7 @@ c &= 0.11 \; &&\text{cal / g \degree C} \;, \\
 \end{aligned}
 \label{eq:prob1}
 \end{equation}
-where $u(x,t)$ is the temperature in \degree C. Numerically integrate this PDE using the explicit forward-time, central-space (FTCS, or Euler) method with $\Delta x = 0.1$ cm. Choose $\Delta t$ such that the diffusion criterion is (a) $d = \tfrac{1}{2}$ and (b) $d = 1$. Compare your solution for (a) at $t = \{1, 2, 4, 8\}$ sec with the analytical solution
+where $u(x,t)$ is the temperature in \degree C. Numerically integrate this PDE using the explicit forward-time, central-space (FTCS, or Euler) method with $\Delta x = 0.1$ cm. This corresponds to $N = 21$ spatial grid points. Choose $\Delta t$ such that the diffusion criterion is (a) $d = \tfrac{1}{2}$ and (b) $d = 1$. Compare your solution for (a) at $t = \{1, 2, 4, 8\}$ sec with the analytical solution
 \begin{equation}
 u = 100 \exp(-0.3738t) \sin(\pi x / 2)
 \;.
@@ -97,9 +97,7 @@ u_i^{n+1} = d u_{i-1}^n + (1-2d) u_i^n + d u_{i+1}^n
 where the diffusion number is defined as
 \begin{equation}
 d = \frac{\alpha \Delta t}{\Delta x^2} 
-\quad
-\rightarrow
-\quad
+\qquad \Rightarrow \qquad
 \Delta t = \frac{d \Delta x^2}{\alpha}
 \;.
 \label{eq:diffusion_number}
@@ -117,6 +115,7 @@ The implicit Crank-Nicolson method with forward time-differencing is most-common
 u_{i+1}^{n+1} - 2 u_i^{n+1} + u_{i-1}^{n+1} + u_{i+1}^n - 2 u_i^n + u_{i-1}^n
 \right)
 \;.
+\label{eq:prob2_crank}
 \end{equation}
 It is a simple matter to re-write this as a linear equation relating the value of $u_i$ at the next time step to its spatial neighbors at the next time step, and its spatial neighbors at the current time step:
 \begin{equation}
@@ -135,6 +134,7 @@ u_{i+1}^{n+1} - 2 u_i^{n+1} + u_{i-1}^{n+1} + u_{i+1}^n - 2 u_i^n + u_{i-1}^n
 =
 \underbrace{\beta \left( u_{i+1}^n - 2 u_i^n + u_{i-1}^n \right) + u_i^n}_{d_i}
 \;,
+\label{eq:matrix_terms}
 \end{equation}
 where
 \begin{equation}
@@ -144,6 +144,28 @@ where
 is known, along with all point-wise values of $u^n$. We solve the system of equations using Dirichlet boundary conditions with the same method detailed in Homework 3.
 
 \subsection{Problem 3}
+
+To incorporate the adiabatic boundary condition \eqref{eq:prob3}, we use one-sided differences to write it as
+\begin{equation}
+\frac{\partial u}{\partial x} \Big|_N^{n+1} \approx \frac{u_N^{n+1} - u_{N-1}^{n+1}}{\Delta x} = 0
+\qquad \Rightarrow \qquad
+u_N^{n+1} = u_{N-1}^{n+1}
+\;,
+\label{eq:adiabatic_bc}
+\end{equation}
+and make the necessary modifications to the diagonal and the RHS vector in our Matlab code based on evaluating \eqref{eq:matrix_terms} with \eqref{eq:adiabatic_bc} substituted in for the terms associated with $i=N$. In other words,
+\begin{equation}
+  \underbrace{\left(           0 \right)}_{b_N} u_{N-1}^{n+1}
++ \underbrace{\left( 1 +   \beta \right)}_{a_N} u_N^{n+1}
++ \underbrace{\left(      -\beta \right)}_{c_N} u_{N+1}^{n+1}
+=
+\underbrace{\beta \left( u_{N+1}^n - 2 u_N^n + u_{N-1}^n \right) + u_N^n}_{d_N}
+\;.
+\label{eq:neumann_matrix}
+\end{equation}
+After the matrix has been solved for the internal points, we then assign $u_N^{n+1} = u_{N-1}^{n+1}$. This approach can be extended to arbitrary Neumann boundary conditions by modifying $d_N$ to account for a non-zero RHS of \eqref{eq:adiabatic_bc}, if desired. In this case, the LHS of \eqref{eq:neumann_matrix} remains the same, and the RHS becomes $d_N \rightarrow d_N + \beta A \Delta x$, where $A$ is the Neumann boundary condition's value.
+
+It should be noted that using these particular one-sided spatial differences, as we have, reduces the accuracy of our solution to only $\bigo(\Delta t^2, \Delta x)$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -195,6 +217,17 @@ Results for the Crank-Nicolson method with Dirichlet boundary conditions are pre
 
 \subsection{Problem 3}
 
+Results for the Crank-Nicolson method with one Dirichlet and one Neumann boundary condition are presented in \figref{fig:Prob3}.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{Prob3.eps}
+\\[-0.5cm]
+\caption{Crank-Nicolson solutions to the thermal diffusion proble with Dirichlet and Neumann boundary conditions of $u(0,t) = 0$ and $u_{,x}(2,t) = 0$. Diffusion number $d$ is chosen to be small so we can show solution progression with high temporal resolution.}
+\label{fig:Prob3}
+\end{center}
+\end{figure}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion} %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -211,6 +244,10 @@ As shown in \figref{fig:Prob2}, the Crank-Nicolson method produces results with 
 
 \subsection{Problem 3}
 
+Solutions for the adiabatic far boundary condition appear stable and in agreement with physical intuition, as can be seen in \figref{fig:Prob3}. From $t=0$ sec to about $t \sim 2.0$ sec, the right side of the domain diffuses temperature rapidly to satisfy the Neumann boundary condition. After $t \sim 2.0$ sec, temperature is distributed fairly evenly across the domain. At this point, progress in the solution is dictated mostly by the Dirichlet boundary condition on the left side of the domain, which slowly removes heat from the domain.
+
+LU decomposition greatly reduces computation time, as we calculate the $\mb{L}$ and $\mb{U}$ matrices only once.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{References} %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -225,10 +262,13 @@ No external references were used other than the course notes for this assignment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The following code listings generate all figures presented in this homework assignment.
+The following code listings generate all figures presented in this homework assignment. Functions such as \lstinline|Thomas.m|, \lstinline|LU_Decompose.m|, and \lstinline|LU_Solve.m| are omitted, since they were previously presented in Homework 4.
 
-%\includecode{Problem_1.m}
-%\includecode{Problem_2.m}
+\includecode{Problem_1.m}
+\includecode{Problem_2.m}
+\includecode{Assemble_u.m}
+\includecode{Problem_3.m}
+\includecode{Assemble_u_Prob3.m}
 
 %%
 %% DOCUMENT END

@@ -1,7 +1,8 @@
 function [] = Problem_2()
 
     %%%%%%
-    % Solves the heat conduction equation (u_,t = a u_,xx) using Crank-Nicolson.
+    % Solves the heat conduction equation (u_,t = a u_,xx) using Crank-Nicolson and
+    % Dirichlet boundary conditions at both ends of the domain.
     %
     % Ryan Skinner, October 2015
     %%%
