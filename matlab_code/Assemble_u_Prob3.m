@@ -26,7 +26,6 @@ function [diag, sub, sup, rhs] = Assemble_u_Prob3( beta, u_prev, BC, dx )
     rhs(1)   = rhs(1) - (-beta) * BC.u0;
     
     % Account for boundary conditions: Neumann du/dx = BC.upf at far boundary.
-     sub(end) =  -beta;
     diag(end) = 1+beta;
      rhs(end) = rhs(end) + beta * BC.upf * dx;
 
