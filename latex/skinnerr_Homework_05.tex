@@ -102,7 +102,7 @@ d = \frac{\alpha \Delta t}{\Delta x^2}
 \;.
 \label{eq:diffusion_number}
 \end{equation}
-Using \eqref{eq:ftcs}, it is trivial to step forward in time with Dirichlet boundary conditions on $u$. We use \eqref{eq:diffusion_number} to obtain the requested diffusion numbers by setting (a) $\Delta t = 0.033$ and (b) $\Delta t = 0.066$.
+Using \eqref{eq:ftcs}, it is trivial to step forward in time with Dirichlet boundary conditions on $u$, by simply solving for each $u_i^{n+1}$ based on the solution for $u$ at the previous time step. We use \eqref{eq:diffusion_number} to obtain the requested diffusion numbers by setting (a) $\Delta t = 0.033$ and (b) $\Delta t = 0.066$.
 
 \subsection{Problem 2}
 
@@ -117,7 +117,7 @@ u_{i+1}^{n+1} - 2 u_i^{n+1} + u_{i-1}^{n+1} + u_{i+1}^n - 2 u_i^n + u_{i-1}^n
 \;.
 \label{eq:prob2_crank}
 \end{equation}
-It is a simple matter to re-write this as a linear equation relating the value of $u_i$ at the next time step to its spatial neighbors at the next time step, and its spatial neighbors at the current time step:
+It is a simple matter to re-write this as a linear equation relating the value of $u_i$ at the next time step to its spatial neighbors at the current and next time steps:
 \begin{equation}
 u_i^{n+1}
 =
@@ -139,9 +139,10 @@ u_{i+1}^{n+1} - 2 u_i^{n+1} + u_{i-1}^{n+1} + u_{i+1}^n - 2 u_i^n + u_{i-1}^n
 where
 \begin{equation}
 \beta = \frac{\alpha \Delta t}{2 \Delta x^2}
-\;,
 \end{equation}
-is known, along with all point-wise values of $u^n$. We solve the system of equations using Dirichlet boundary conditions with the same method detailed in Homework 3.
+is known, along with all point-wise values of $u^n$.
+
+We use the formulation \eqref{eq:matrix_terms} to construct a matrix system of equations using Dirichlet boundary conditions with the same technique that was explained in Homework 4 with regard to central differences. The reader is directed to Homework 4 for an explanation of the Thomas algorithm subsequently used to solve this matrix system.
 
 \subsection{Problem 3}
 
@@ -153,19 +154,22 @@ u_N^{n+1} = u_{N-1}^{n+1}
 \;,
 \label{eq:adiabatic_bc}
 \end{equation}
-and make the necessary modifications to the diagonal and the RHS vector in our Matlab code based on evaluating \eqref{eq:matrix_terms} with \eqref{eq:adiabatic_bc} substituted in for the terms associated with $i=N$. In other words,
+and make the necessary modifications to the diagonal and the RHS vector in our Matlab code based on evaluating \eqref{eq:matrix_terms} with \eqref{eq:adiabatic_bc} substituted in for the terms associated with $i=N-1$. Recall that the solution vector for our matrix system is $[ u_2^{n+1}, \dots, u_{N-1}^{n+1} ]^T$. In other words, the Neumann boundary condition modifies the last grid point \emph{within} the domain as
 \begin{equation}
-  \underbrace{\left(           0 \right)}_{b_N} u_{N-1}^{n+1}
-+ \underbrace{\left( 1 +   \beta \right)}_{a_N} u_N^{n+1}
-+ \underbrace{\left(      -\beta \right)}_{c_N} u_{N+1}^{n+1}
+  \underbrace{\left(      -\beta \right)}_{b_{N-1}} u_{N-2}^{n+1}
++ \underbrace{\left( 1 +   \beta \right)}_{a_{N-1}} u_{N-1}^{n+1}
 =
-\underbrace{\beta \left( u_{N+1}^n - 2 u_N^n + u_{N-1}^n \right) + u_N^n}_{d_N}
-\;.
+\underbrace{\beta \left( u_{N-2}^n - 2 u_{N-1}^n + u_{N}^n \right) + u_{N-1}^n}_{d_{N-1}}
+\;,
 \label{eq:neumann_matrix}
 \end{equation}
-After the matrix has been solved for the internal points, we then assign $u_N^{n+1} = u_{N-1}^{n+1}$. This approach can be extended to arbitrary Neumann boundary conditions by modifying $d_N$ to account for a non-zero RHS of \eqref{eq:adiabatic_bc}, if desired. In this case, the LHS of \eqref{eq:neumann_matrix} remains the same, and the RHS becomes $d_N \rightarrow d_N + \beta A \Delta x$, where $A$ is the Neumann boundary condition's value.
+noting that $c_{N-1}$ simply does not exist in our matrix system, as it represents the dependence of $u_{N-1}^{n+1}$ on $u_N^{n+1}$, which is not included in our solution vector. After the matrix has been solved for the internal points, we then assign $u_N^{n+1} = u_{N-1}^{n+1}$.
+
+This approach can be extended to arbitrary Neumann boundary conditions by modifying $d_N$ to account for a non-zero RHS of \eqref{eq:adiabatic_bc}, if desired. In this case, the LHS of \eqref{eq:neumann_matrix} remains the same, and the RHS becomes $d_N \rightarrow d_N + \beta A \Delta x$, where $A$ is the Neumann boundary condition's value. In this case, we then update the final grid point to reflect the prescribed Neumann boundary condition using $u_N^{n+1} = u_{N-1}^{n+1} + A  \Delta x$.
 
 It should be noted that using these particular one-sided spatial differences, as we have, reduces the accuracy of our solution to only $\bigo(\Delta t^2, \Delta x)$.
+
+Since only the RHS, $d_i$, changes as we progress forward in time, LU decomposition is well-suited for this problem. The $\mb{L}$ and $\mb{U}$ matrices need only be calculated once, and then passed to our \lstinline|LU_Solve| function along with the time step-dependent RHS. As with the Thomas algorithm, the reader is directed to Homework 4 for an explanation of LU decomposition and solution.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -175,7 +179,7 @@ It should be noted that using these particular one-sided spatial differences, as
 
 \subsection{Problem 1}
 
-Results for the FTCS method are presented in \figref{fig:Prob1}.
+Results for the FTCS method are presented in \figref{fig:Prob1}. Relative error at $t=0$ sec is identically zero, since the initial guess is the analytical solution. This holds true for Problem 2 as well.
 
 \begin{figure}[h!]
 \begin{center}
@@ -246,7 +250,7 @@ As shown in \figref{fig:Prob2}, the Crank-Nicolson method produces results with 
 
 Solutions for the adiabatic far boundary condition appear stable and in agreement with physical intuition, as can be seen in \figref{fig:Prob3}. From $t=0$ sec to about $t \sim 2.0$ sec, the right side of the domain diffuses temperature rapidly to satisfy the Neumann boundary condition. After $t \sim 2.0$ sec, temperature is distributed fairly evenly across the domain. At this point, progress in the solution is dictated mostly by the Dirichlet boundary condition on the left side of the domain, which slowly removes heat from the domain.
 
-LU decomposition greatly reduces computation time, as we calculate the $\mb{L}$ and $\mb{U}$ matrices only once.
+It is anecdotally observed that LU decomposition substantially reduces computation time relative to the Thomas algorithm when solving successive iterations.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
