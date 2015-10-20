@@ -154,16 +154,16 @@ u_N^{n+1} = u_{N-1}^{n+1}
 \;,
 \label{eq:adiabatic_bc}
 \end{equation}
-and make the necessary modifications to the diagonal and the RHS vector in our Matlab code based on evaluating \eqref{eq:matrix_terms} with \eqref{eq:adiabatic_bc} substituted in for the terms associated with $i=N-1$. Recall that the solution vector for our matrix system is $[ u_2^{n+1}, \dots, u_{N-1}^{n+1} ]^T$. In other words, the Neumann boundary condition modifies the last grid point \emph{within} the domain as
+and make the necessary modifications to the diagonal and the RHS vector in our Matlab code based on evaluating \eqref{eq:matrix_terms} with $i=N-1$, and substituting in the relationship \eqref{eq:adiabatic_bc}. Recall that the solution vector for our matrix system is $[ u_2^{n+1}, \dots, u_{N-1}^{n+1} ]^T$. Performing the aforementioned steps, we see that the Neumann boundary condition modifies the equation for the last grid point \emph{within} the domain as
 \begin{equation}
   \underbrace{\left(      -\beta \right)}_{b_{N-1}} u_{N-2}^{n+1}
 + \underbrace{\left( 1 +   \beta \right)}_{a_{N-1}} u_{N-1}^{n+1}
 =
 \underbrace{\beta \left( u_{N-2}^n - 2 u_{N-1}^n + u_{N}^n \right) + u_{N-1}^n}_{d_{N-1}}
-\;,
+\;.
 \label{eq:neumann_matrix}
 \end{equation}
-noting that $c_{N-1}$ simply does not exist in our matrix system, as it represents the dependence of $u_{N-1}^{n+1}$ on $u_N^{n+1}$, which is not included in our solution vector. After the matrix has been solved for the internal points, we then assign $u_N^{n+1} = u_{N-1}^{n+1}$.
+Note that $c_{N-1}$ simply does not exist in our matrix system, as it represents the dependence of $u_{N-1}^{n+1}$ on $u_N^{n+1}$, which is not included in our solution vector. After the matrix has been solved for the internal points, we then assign $u_N^{n+1} = u_{N-1}^{n+1}$ to preserve \eqref{eq:adiabatic_bc}.
 
 This approach can be extended to arbitrary Neumann boundary conditions by modifying $d_N$ to account for a non-zero RHS of \eqref{eq:adiabatic_bc}, if desired. In this case, the LHS of \eqref{eq:neumann_matrix} remains the same, and the RHS becomes $d_N \rightarrow d_N + \beta A \Delta x$, where $A$ is the Neumann boundary condition's value. In this case, we then update the final grid point to reflect the prescribed Neumann boundary condition using $u_N^{n+1} = u_{N-1}^{n+1} + A  \Delta x$.
 
